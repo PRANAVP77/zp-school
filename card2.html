@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZP Dhule - Pride Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Marathi:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #f39c12;
+            --dark-orange: #e67e22;
+            --bg-gradient: linear-gradient(135deg, #fcd68a 0%, #f39c12 100%);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            font-family: 'Noto Sans Marathi', sans-serif;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        /* Glassmorphism Card Effect */
+        #preview-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            display: block;
+        }
+
+        .input-group {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-download { background: var(--dark-orange); color: white; }
+        .btn-reset { background: #fff; border: 1px solid #ddd; color: #666; }
+
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .instruction {
+            font-size: 10px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div id="preview-container">
+        <canvas id="statusCanvas" width="600" height="900"></canvas>
+    </div>
+
+    <div class="input-group">
+        <input type="file" id="imageInput" accept="image/*">
+        <input type="text" id="nameInput" placeholder="येथे नाव लिहा...">
+        <input type="text" id="postInput" placeholder="येथे पदनाम लिहा...">
+        <input type="text" id="schoolInput" placeholder="शाळेचे नाव लिहा...">
+
+        <div class="btn-row">
+            <button class="btn-download" onclick="downloadImage()">📥 WhatsApp Status डाउनलोड करा</button>
+            <button class="btn-reset" onclick="resetAll()">🔄 साफ करा</button>
+        </div>
+        <p class="instruction">📱 फोटो व माहिती भरा → डाउनलोड करा → WhatsApp Status ला लावा</p>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('statusCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let userImg = null;
+
+    function draw() {
+        const name = document.getElementById('nameInput').value || "येथे नाव लिहा...";
+        const post = document.getElementById('postInput').value || "येथे पदनाम लिहा...";
+        const school = document.getElementById('schoolInput').value || "शाळेचे नाव लिहा...";
+
+        // 1. Background Gradient (Matched to your screenshot)
+        let bgGrad = ctx.createLinearGradient(0, 0, 0, 900);
+        bgGrad.addColorStop(0, '#fdeeb7');
+        bgGrad.addColorStop(1, '#f39c12');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 600, 900);
+
+        // 2. Main White Rounded Card
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        roundRect(ctx, 40, 40, 520, 820, 40, true, false);
+
+        // 3. Header Section (Logo + Text)
+        ctx.fillStyle = "#003366";
+        ctx.font = "bold 28px 'Noto Sans Marathi'";
+        ctx.textAlign = "left";
+        ctx.fillText("जिल्हा परिषद धुळे", 180, 100);
+        ctx.font = "18px 'Noto Sans Marathi'";
+        ctx.fillText("शिक्षण विभाग", 180, 130);
+
+	// --- Add this block to your code ---
+const logoImg = new Image();
+logoImg.src = 'logo.png'; // OR use a URL like 'https://example.com/logo.png'
+logoImg.onload = function() {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(110, 110, 45, 0, Math.PI * 2); // Slightly smaller than the white circle
+    ctx.clip();
+    ctx.drawImage(logoImg, 65, 65, 90, 90); // (Image, X, Y, Width, Height)
+    ctx.restore();
+};
+// -----------------------------------
+        
+        // Circular Logo Placeholder
+        ctx.beginPath();
+        ctx.arc(110, 110, 50, 0, Math.PI * 2);
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+        ctx.strokeStyle = "#f39c12";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 4. Circular Photo Frame
+        const centerX = 300;
+        const centerY = 330;
+        const radius = 130;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.clip();
+        
+        if (userImg) {
+            ctx.drawImage(userImg, centerX - radius, centerY - radius, radius * 2, radius * 2);
+        } else {
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+            ctx.fillStyle = "#999";
+            ctx.font = "16px 'Noto Sans Marathi'";
+            ctx.textAlign = "center";
+            ctx.fillText("📷 फोटो अपलोड करा", centerX, centerY);
+        }
+        ctx.restore();
+        
+        // Circular border for photo
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255,255,255,0.8)";
+        ctx.lineWidth = 8;
+        ctx.stroke();
+
+        // 5. Text Content
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#d35400";
+        ctx.font = "bold 32px 'Noto Sans Marathi'";
+        ctx.fillText("\"मी जि. प. शाळेचा विद्यार्थी\"", 300, 550);
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 22px 'Noto Sans Marathi'";
+        ctx.fillText("नाव : " + name, 80, 620);
+        ctx.fillText("पदनाम : " + post, 80, 680);
+        ctx.fillText("मी शिकलेली जि. प. शाळा : ", 80, 740);
+        
+        ctx.font = "20px 'Noto Sans Marathi'";
+        ctx.fillText(school, 80, 780);
+
+        // Underlines
+        ctx.strokeStyle = "#f39c12";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath(); ctx.moveTo(80, 630); ctx.lineTo(520, 630); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(80, 690); ctx.lineTo(520, 690); ctx.stroke();
+        ctx.setLineDash([]); // Reset dash
+
+        // 6. Bottom Banner
+        let btnGrad = ctx.createLinearGradient(0, 800, 0, 860);
+        btnGrad.addColorStop(0, '#f39c12');
+        btnGrad.addColorStop(1, '#e67e22');
+        ctx.fillStyle = btnGrad;
+        roundRect(ctx, 100, 810, 400, 60, 30, true, false);
+        
+        ctx.fillStyle = "white";
+        ctx.font = "bold 22px 'Noto Sans Marathi'";
+        ctx.textAlign = "center";
+        ctx.fillText("\"माझी शाळा माझा अभिमान\"", 300, 848);
+    }
+
+    // Helper for rounded rectangles
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
+    }
+
+    // Events
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            userImg = new Image();
+            userImg.onload = draw;
+            userImg.src = event.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    });
+
+    ['nameInput', 'postInput', 'schoolInput'].forEach(id => {
+        document.getElementById(id).addEventListener('input', draw);
+    });
+
+    function downloadImage() {
+        const link = document.createElement('a');
+        link.download = 'ZP_Dhule_Pride.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    }
+
+    function resetAll() {
+        document.getElementById('nameInput').value = '';
+        document.getElementById('postInput').value = '';
+        document.getElementById('schoolInput').value = '';
+        userImg = null;
+        draw();
+    }
+
+    window.onload = draw;
+</script>
+
+</body>
+</html>
